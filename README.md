@@ -60,10 +60,10 @@ You were given this repo and two keys. Do this:
    - The brain key goes in `ANTHROPIC_API_KEY` if it starts with `sk-ant-`, or in `OPENROUTER_API_KEY` if it starts with `sk-or-`. Leave the other one empty.
 4. Start JARVIS in the background with `run.bat` on Windows or `./run.sh` on Mac and Linux. It is a local web server that keeps running, so don't wait for it to exit. The first start takes about 30 seconds because it builds `.venv` and installs one package.
 5. JARVIS prints his address (`http://127.0.0.1:8765`, or the next free port) and opens it in the default browser by himself. Voice input needs Chrome or Edge.
-6. Check that `/api/status` on that address returns `"voice": true` and `"brain": true`.
+6. Test both keys for real. `/api/status` only shows that the keys are filled in, not that they work. Send `POST /api/chat` with `{"text": "Are you online?"}` and check the reply has no `"error"` field. Then send `POST /api/tts` with `{"text": "Online."}` and check it returns audio. If one fails, its message says which key is wrong.
 7. Tell the user to click the page once to wake JARVIS, then hold Space to talk. Next time they start him by double-clicking `run.bat` or running `./run.sh`.
 
-If `.env` is missing a key, the launcher asks for it in the terminal, so write `.env` first. JARVIS only reads keys from `.env`, never from environment variables. Don't repeat the keys back to the user and don't commit `.env`.
+If `.env` is missing a key, the launcher asks for it in the terminal, so write `.env` first. JARVIS reads keys from `.env` only, never from environment variables. On a machine with no screen, set the environment variable `JARVIS_NO_BROWSER=1` so he doesn't open a browser. Don't repeat the keys back to the user and don't commit `.env`.
 
 </details>
 

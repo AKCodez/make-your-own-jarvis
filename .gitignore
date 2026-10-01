@@ -1,7 +1,8 @@
-# your keys never leave your computer
+# your keys stay out of git
 .env
 
 .venv/
 __pycache__/
 *.pyc
+*.log
 .DS_Store

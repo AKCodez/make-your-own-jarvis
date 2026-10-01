@@ -509,7 +509,8 @@ BANNER = r"""
 
 def main() -> None:
     try:
-        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+        # Line-buffered, so the address shows up right away even when the output goes to a log file.
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace", line_buffering=True)
     except (AttributeError, ValueError):
         pass
     print(BANNER)
