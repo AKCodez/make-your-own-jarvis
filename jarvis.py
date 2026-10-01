@@ -77,7 +77,9 @@ def read_env_file() -> dict[str, str]:
 def load_settings() -> dict[str, str]:
     cfg = dict(DEFAULTS)
     cfg.update({k: v for k, v in read_env_file().items() if v})
-    for key in ("FISH_API_KEY", "ANTHROPIC_API_KEY", "OPENROUTER_API_KEY", *DEFAULTS):
+    # Keys come from the .env file only, so a key another app left in the system environment
+    # never gets used (or billed) by surprise. The other settings can be overridden for testing.
+    for key in DEFAULTS:
         if os.environ.get(key):
             cfg[key] = os.environ[key].strip()
     return cfg

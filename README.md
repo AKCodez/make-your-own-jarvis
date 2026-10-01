@@ -33,23 +33,39 @@ Claude is the brain. [Fish Audio](https://ariacodez.ai/l/fish-audio) is the voic
 
 ---
 
-## ⚡ The easy way: let Claude set it up
+## ⚡ The easy way: one prompt
 
-If you have [Claude Code](https://claude.com/claude-code), open it and paste this:
+If you have [Claude Code](https://claude.com/claude-code), open it, paste this, and swap in your two keys:
 
 ```text
-Set up JARVIS for me from https://github.com/AKCodez/make-your-own-jarvis
+Set up JARVIS for me and start it: https://github.com/AKCodez/make-your-own-jarvis
 
-1. Check that Python 3.10 or newer is installed. If it isn't, install it for me.
-2. Clone the repo into my home folder.
-3. Copy .env.example to .env and open it in Notepad (TextEdit on Mac) so I can paste my
-   Fish Audio key and my brain key (Claude, or the free OpenRouter one) myself. Don't ask
-   me for the keys in this chat.
-4. When I say "done", start JARVIS in the background (run.bat on Windows, ./run.sh on
-   Mac or Linux) and open the address it prints in Chrome.
+Fish Audio key: PASTE_YOUR_FISH_AUDIO_KEY
+Claude or OpenRouter key: PASTE_YOUR_BRAIN_KEY
 ```
 
-Paste your two keys into the file that opens, save it, and type **done**. Boom, you've got JARVIS. 🎉
+Hit Enter and Claude does the whole setup. Boom, you've got JARVIS. 🎉
+
+If you'd rather not paste keys into a chat, use the manual way below.
+
+<details>
+<summary>🤖 Setup steps for Claude (or any AI assistant)</summary>
+
+You were given this repo and two keys. Do this:
+
+1. Make sure Python 3.10 or newer is installed (`python --version`, or `python3 --version` on Mac and Linux). Install it if it's missing.
+2. Clone this repo into the user's home folder, unless they named another place.
+3. Copy `.env.example` to `.env` and fill in the keys before you start anything:
+   - `FISH_API_KEY` is the Fish Audio key.
+   - The brain key goes in `ANTHROPIC_API_KEY` if it starts with `sk-ant-`, or in `OPENROUTER_API_KEY` if it starts with `sk-or-`. Leave the other one empty.
+4. Start JARVIS in the background with `run.bat` on Windows or `./run.sh` on Mac and Linux. It is a local web server that keeps running, so don't wait for it to exit. The first start takes about 30 seconds because it builds `.venv` and installs one package.
+5. JARVIS prints his address (`http://127.0.0.1:8765`, or the next free port) and opens it in the default browser by himself. Voice input needs Chrome or Edge.
+6. Check that `/api/status` on that address returns `"voice": true` and `"brain": true`.
+7. Tell the user to click the page once to wake JARVIS, then hold Space to talk. Next time they start him by double-clicking `run.bat` or running `./run.sh`.
+
+If `.env` is missing a key, the launcher asks for it in the terminal, so write `.env` first. JARVIS only reads keys from `.env`, never from environment variables. Don't repeat the keys back to the user and don't commit `.env`.
+
+</details>
 
 ### 💬 Then change anything with one sentence
 
@@ -169,7 +185,7 @@ All settings live in the `.env` file. Close the JARVIS window and start it again
 
 ## 🔒 Your keys
 
-Your keys only live in the `.env` file on your computer. That file is in `.gitignore`, so it never gets uploaded anywhere. Don't share it or post it.
+JARVIS saves your keys in the `.env` file on your computer. That file is in `.gitignore`, so it never gets uploaded anywhere. Don't share it or post it.
 
 ---
 
