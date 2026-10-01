@@ -1,0 +1,476 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>J.A.R.V.I.S.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Rajdhani:wght@500;600&display=swap">
+<style>
+  :root {
+    --bg: #02060c;
+    --cyan: #3fd8ff;
+    --glow: rgba(63, 216, 255, 0.35);
+    --amber: #ffb347;
+    --red: #ff5a5f;
+    --text: #d9f6ff;
+    --muted: #6f93a6;
+    --panel: rgba(10, 30, 45, 0.55);
+    --accent: var(--cyan);
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    background: radial-gradient(ellipse at center, #062033 0%, var(--bg) 70%);
+    color: var(--text);
+    font-family: "Rajdhani", "Segoe UI", system-ui, sans-serif;
+    overflow: hidden;
+  }
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(63, 216, 255, 0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(63, 216, 255, 0.04) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+  }
+  header {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    display: flex;
+    justify-content: space-between;
+    padding: 18px 26px;
+    font-family: "Orbitron", sans-serif;
+    font-size: 12px;
+    letter-spacing: 0.18em;
+    color: var(--muted);
+  }
+  .pill { display: inline-flex; align-items: center; gap: 8px; margin-right: 22px; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--muted); }
+  .dot.on { background: var(--cyan); box-shadow: 0 0 10px var(--cyan); }
+  .dot.off { background: var(--red); box-shadow: 0 0 10px var(--red); }
+  main {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 22px;
+    padding-bottom: 120px;
+  }
+  h1 {
+    margin: 0;
+    padding-left: 0.5em;
+    font-family: "Orbitron", sans-serif;
+    font-weight: 700;
+    font-size: clamp(22px, 3vw, 34px);
+    letter-spacing: 0.5em;
+    color: var(--cyan);
+    text-shadow: 0 0 18px var(--glow);
+  }
+  .sub { margin-top: -14px; font-size: 12px; letter-spacing: 0.3em; color: var(--muted); text-transform: uppercase; }
+  .reactor { position: relative; width: min(42vh, 360px); aspect-ratio: 1; cursor: pointer; --level: 0; }
+  .ring { position: absolute; border-radius: 50%; }
+  .r1 { inset: 0; border: 2px dashed var(--accent); opacity: 0.45; animation: spin 24s linear infinite; }
+  .r2 { inset: 7%; border: 3px solid transparent; border-top-color: var(--accent); border-bottom-color: var(--accent); opacity: 0.75; animation: spin 9s linear infinite reverse; }
+  .r3 { inset: 15%; border: 1px solid var(--accent); opacity: 0.35; }
+  .r4 { inset: 20%; border: 6px solid transparent; border-left-color: var(--accent); border-right-color: var(--accent); opacity: 0.6; animation: spin 5s linear infinite; }
+  .core {
+    position: absolute;
+    inset: 31%;
+    border-radius: 50%;
+    background: radial-gradient(circle, #ffffff 0%, var(--accent) 35%, rgba(63, 216, 255, 0.15) 70%, transparent 72%);
+    box-shadow: 0 0 calc(30px + var(--level) * 90px) var(--accent), inset 0 0 30px rgba(255, 255, 255, 0.4);
+    transform: scale(calc(1 + var(--level) * 0.35));
+    transition: transform 0.06s linear, box-shadow 0.06s linear;
+  }
+  .state-listening { --accent: #7ff3ff; }
+  .state-listening .r2 { animation-duration: 2.5s; }
+  .state-listening .r4 { animation-duration: 1.6s; }
+  .state-listening .core { animation: breathe 1s ease-in-out infinite; }
+  .state-thinking { --accent: var(--amber); }
+  .state-thinking .r2, .state-thinking .r4 { animation-duration: 1.2s; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @keyframes breathe { 50% { filter: brightness(1.35); } }
+  .status {
+    min-height: 18px;
+    font-family: "Orbitron", sans-serif;
+    font-size: 13px;
+    letter-spacing: 0.35em;
+    color: var(--accent);
+    text-transform: uppercase;
+  }
+  .log {
+    width: min(760px, 92vw);
+    min-height: 86px;
+    padding: 14px 18px;
+    background: var(--panel);
+    border: 1px solid rgba(63, 216, 255, 0.18);
+    border-radius: 14px;
+    backdrop-filter: blur(6px);
+  }
+  .line { margin: 2px 0; font-size: 19px; line-height: 1.4; }
+  .who { margin-right: 10px; font-family: "Orbitron", sans-serif; font-size: 11px; letter-spacing: 0.25em; color: var(--muted); }
+  .you .txt { color: #a9c7d6; }
+  footer {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 16px;
+  }
+  .hint { font-size: 15px; letter-spacing: 0.08em; color: var(--muted); }
+  kbd { padding: 2px 7px; border: 1px solid var(--muted); border-radius: 5px; font-family: "Orbitron", sans-serif; font-size: 11px; color: var(--text); }
+  form { display: flex; gap: 8px; width: min(560px, 92vw); }
+  input {
+    flex: 1;
+    padding: 10px 14px;
+    background: rgba(5, 18, 28, 0.8);
+    border: 1px solid rgba(63, 216, 255, 0.25);
+    border-radius: 10px;
+    color: var(--text);
+    font: inherit;
+    font-size: 16px;
+    outline: none;
+  }
+  input:focus { border-color: var(--cyan); }
+  button {
+    padding: 0 16px;
+    background: transparent;
+    border: 1px solid var(--cyan);
+    border-radius: 10px;
+    color: var(--cyan);
+    font-family: "Orbitron", sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    cursor: pointer;
+  }
+  .credit { font-size: 12px; letter-spacing: 0.12em; color: var(--muted); }
+  .toast {
+    position: fixed;
+    top: 60px; left: 50%;
+    transform: translateX(-50%);
+    display: none;
+    max-width: 90vw;
+    padding: 10px 16px;
+    background: rgba(40, 12, 14, 0.92);
+    border: 1px solid var(--red);
+    border-radius: 10px;
+    color: #ffd6d6;
+    font-size: 15px;
+    z-index: 5;
+  }
+  .wake {
+    position: fixed;
+    inset: 0;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    background: rgba(1, 5, 10, 0.88);
+    cursor: pointer;
+    font-family: "Orbitron", sans-serif;
+    letter-spacing: 0.4em;
+    color: var(--cyan);
+    text-align: center;
+  }
+  .wake small { font-family: "Rajdhani", sans-serif; font-size: 14px; letter-spacing: 0.15em; color: var(--muted); }
+  @media (prefers-reduced-motion: reduce) { .ring, .core { animation: none !important; } }
+</style>
+</head>
+<body class="state-idle">
+  <div class="wake" id="wake">CLICK TO WAKE J.A.R.V.I.S.<small>Your browser needs one click before he can speak</small></div>
+
+  <header>
+    <div>
+      <span class="pill"><span class="dot" id="dotVoice"></span>VOICE &middot; FISH AUDIO</span>
+      <span class="pill"><span class="dot" id="dotBrain"></span>BRAIN &middot; CLAUDE</span>
+    </div>
+    <div id="clock"></div>
+  </header>
+
+  <main>
+    <h1>J.A.R.V.I.S.</h1>
+    <div class="sub">Just A Rather Very Intelligent System</div>
+    <div class="reactor" id="reactor" title="Click to talk">
+      <div class="ring r1"></div>
+      <div class="ring r2"></div>
+      <div class="ring r3"></div>
+      <div class="ring r4"></div>
+      <div class="core"></div>
+    </div>
+    <div class="status" id="status">Standing by</div>
+    <div class="log" id="log"></div>
+  </main>
+
+  <footer>
+    <div class="hint">Hold <kbd>SPACE</kbd> or click the core to talk</div>
+    <form id="typeForm">
+      <input id="typeBox" placeholder="Or type to JARVIS..." autocomplete="off">
+      <button type="submit">SEND</button>
+    </form>
+    <div class="credit">Voice by Fish Audio &middot; Brain by Claude</div>
+  </footer>
+
+  <div class="toast" id="toast"></div>
+  <audio id="voice"></audio>
+
+<script>
+  const $ = (id) => document.getElementById(id);
+  const reactor = $('reactor');
+  const statusEl = $('status');
+  const logEl = $('log');
+  const voice = $('voice');
+  const typeBox = $('typeBox');
+  const LABELS = { idle: 'Standing by', listening: 'Listening', thinking: 'Thinking', speaking: 'Speaking' };
+  let calls = 'sir';
+  let busy = false;
+
+  function setState(state) {
+    document.body.className = 'state-' + state;
+    statusEl.textContent = LABELS[state];
+  }
+
+  function addLine(cls, who, text) {
+    const line = document.createElement('div');
+    line.className = 'line ' + cls;
+    const whoEl = document.createElement('span');
+    whoEl.className = 'who';
+    whoEl.textContent = who;
+    const txt = document.createElement('span');
+    txt.className = 'txt';
+    txt.textContent = text;
+    line.append(whoEl, txt);
+    logEl.append(line);
+    return txt;
+  }
+
+  function showExchange(you, jarvis) {
+    logEl.innerHTML = '';
+    if (you) addLine('you', 'YOU', you);
+    if (jarvis) addLine('jarvis', 'JARVIS', jarvis);
+  }
+
+  let toastTimer;
+  function toast(message) {
+    const el = $('toast');
+    el.textContent = message;
+    el.style.display = 'block';
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => { el.style.display = 'none'; }, 8000);
+  }
+
+  setInterval(() => {
+    $('clock').textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  }, 1000);
+
+  async function loadStatus() {
+    try {
+      const s = await (await fetch('/api/status')).json();
+      calls = s.calls || 'sir';
+      $('dotVoice').className = 'dot ' + (s.voice ? 'on' : 'off');
+      $('dotBrain').className = 'dot ' + (s.brain ? 'on' : 'off');
+      if (!s.brain) toast('No Claude key yet. Add ANTHROPIC_API_KEY to the .env file and restart JARVIS.');
+    } catch {
+      toast('Lost contact with JARVIS. Is the JARVIS window still open?');
+    }
+  }
+  loadStatus();
+
+  // ---- voice output + audio-reactive core
+  let audioCtx = null;
+  let analyser = null;
+  let samples = null;
+  function initAudio() {
+    if (audioCtx) return;
+    try {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const source = audioCtx.createMediaElementSource(voice);
+      analyser = audioCtx.createAnalyser();
+      analyser.fftSize = 512;
+      samples = new Uint8Array(analyser.fftSize);
+      source.connect(analyser);
+      analyser.connect(audioCtx.destination);
+    } catch {
+      analyser = null;
+    }
+    requestAnimationFrame(meter);
+  }
+  function meter() {
+    let level = 0;
+    if (analyser && !voice.paused) {
+      analyser.getByteTimeDomainData(samples);
+      let sum = 0;
+      for (const v of samples) { const x = (v - 128) / 128; sum += x * x; }
+      level = Math.min(1, Math.sqrt(sum / samples.length) * 4);
+    }
+    reactor.style.setProperty('--level', level.toFixed(3));
+    requestAnimationFrame(meter);
+  }
+
+  let speakToken = 0;
+  function stopSpeaking() {
+    speakToken += 1;
+    voice.pause();
+    if ('speechSynthesis' in window) speechSynthesis.cancel();
+  }
+  function backupVoice(text) {
+    return new Promise((resolve) => {
+      if (!('speechSynthesis' in window)) return resolve();
+      const u = new SpeechSynthesisUtterance(text);
+      u.onend = resolve;
+      u.onerror = resolve;
+      speechSynthesis.speak(u);
+    });
+  }
+  async function speak(text) {
+    const token = ++speakToken;
+    setState('speaking');
+    try {
+      const r = await fetch('/api/tts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text }),
+      });
+      if (!r.ok) {
+        let message = 'The Fish Audio voice is unavailable, so JARVIS is using the backup voice.';
+        try { message = (await r.json()).error || message; } catch {}
+        throw new Error(message);
+      }
+      const blob = await r.blob();
+      if (token !== speakToken) return;
+      if (audioCtx && audioCtx.state === 'suspended') await audioCtx.resume();
+      const src = URL.createObjectURL(blob);
+      voice.src = src;
+      await voice.play();
+      await new Promise((resolve) => { voice.onpause = resolve; voice.onerror = resolve; });
+      URL.revokeObjectURL(src);
+    } catch (err) {
+      if (token !== speakToken) return;
+      toast(err.message);
+      await backupVoice(text);
+    }
+    if (token === speakToken) setState('idle');
+  }
+
+  // ---- talking to the brain
+  async function send(text) {
+    text = text.trim();
+    if (!text || busy) return;
+    busy = true;
+    stopSpeaking();
+    showExchange(text, '');
+    setState('thinking');
+    const replyEl = addLine('jarvis', 'JARVIS', '...');
+    try {
+      const r = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text }),
+      });
+      const data = await r.json();
+      const reply = data.reply || data.error || 'Something went wrong.';
+      replyEl.textContent = reply;
+      if (data.error) toast(reply);
+      busy = false;
+      await speak(reply);
+    } catch {
+      replyEl.textContent = 'I lost contact with my server. Is the JARVIS window still open?';
+      busy = false;
+      setState('idle');
+    }
+  }
+
+  // ---- voice input (built into Chrome and Edge)
+  const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  let rec = null;
+  let listening = false;
+  let heard = '';
+  let interim = '';
+  function startListening() {
+    if (busy || listening) return;
+    if (!Recognition) {
+      toast('Voice input needs Chrome or Edge. You can still type below.');
+      return;
+    }
+    stopSpeaking();
+    heard = '';
+    interim = '';
+    rec = new Recognition();
+    rec.lang = 'en-US';
+    rec.interimResults = true;
+    rec.continuous = true;
+    rec.onresult = (e) => {
+      interim = '';
+      for (let i = e.resultIndex; i < e.results.length; i++) {
+        const result = e.results[i];
+        if (result.isFinal) heard += result[0].transcript + ' ';
+        else interim += result[0].transcript;
+      }
+      showExchange((heard + interim).trim() || '...', '');
+    };
+    rec.onerror = (e) => {
+      if (e.error === 'not-allowed' || e.error === 'service-not-allowed') {
+        toast('Microphone blocked. Click the icon at the left of the address bar and allow the microphone.');
+      } else if (e.error !== 'no-speech' && e.error !== 'aborted') {
+        toast('Voice input problem: ' + e.error);
+      }
+    };
+    rec.onend = () => {
+      listening = false;
+      const said = (heard + interim).trim();
+      if (said) send(said);
+      else setState('idle');
+    };
+    try {
+      rec.start();
+      listening = true;
+      setState('listening');
+    } catch {
+      listening = false;
+    }
+  }
+  function stopListening() {
+    if (rec && listening) {
+      try { rec.stop(); } catch {}
+    }
+  }
+
+  document.addEventListener('keydown', (e) => {
+    if (e.code !== 'Space' || e.repeat || e.target === typeBox) return;
+    e.preventDefault();
+    startListening();
+  });
+  document.addEventListener('keyup', (e) => {
+    if (e.code !== 'Space' || e.target === typeBox) return;
+    e.preventDefault();
+    stopListening();
+  });
+  reactor.addEventListener('click', () => (listening ? stopListening() : startListening()));
+  $('typeForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const text = typeBox.value;
+    typeBox.value = '';
+    typeBox.blur();
+    send(text);
+  });
+
+  $('wake').addEventListener('click', () => {
+    $('wake').remove();
+    initAudio();
+    const hour = new Date().getHours();
+    const part = hour < 12 ? 'morning' : hour < 18 ? 'afternoon' : 'evening';
+    const greeting = `Good ${part}, ${calls}. All systems are online.`;
+    showExchange('', greeting);
+    speak(greeting);
+  });
+</script>
+</body>
+</html>

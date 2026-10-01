@@ -1,0 +1,22 @@
+[
+  {
+    "say": "activate e-girl mode",
+    "voice": "98655a12fa944e26b274c535e5e03842",
+    "reply": "Hey. Let's bring your dreams to reality. What can I do for you?"
+  },
+  {
+    "say": "activate jarvis mode",
+    "voice": "default",
+    "reply": "JARVIS voice restored, {you}. Shall we pretend that never happened?"
+  },
+  {
+    "say": "activate party protocol",
+    "reply": "Right away, {you}. Initiating the party protocol.",
+    "open": ["https://open.spotify.com"]
+  },
+  {
+    "say": "activate work mode",
+    "reply": "Of course, {you}. Pulling up your workspace.",
+    "open": ["https://mail.google.com", "https://calendar.google.com"]
+  }
+]
