@@ -58,8 +58,8 @@ You were given this repo and two keys. Do this:
 3. Copy `.env.example` to `.env` and fill in the keys before you start anything:
    - `FISH_API_KEY` is the Fish Audio key.
    - The brain key goes in `ANTHROPIC_API_KEY` if it starts with `sk-ant-`, or in `OPENROUTER_API_KEY` if it starts with `sk-or-`. Leave the other one empty.
-4. Start JARVIS in the background with `run.bat` on Windows or `./run.sh` on Mac and Linux. It is a local web server that keeps running, so don't wait for it to exit. The first start takes about 30 seconds because it builds `.venv` and installs one package.
-5. JARVIS prints his address (`http://127.0.0.1:8765`, or the next free port) and opens it in the default browser by himself. Voice input needs Chrome or Edge.
+4. Start JARVIS in his own window, so he keeps running after this chat is closed. On Windows, run `powershell -Command "Start-Process run.bat"` in the JARVIS folder. On Mac and Linux, run `nohup ./run.sh > jarvis.log 2>&1 &`. He is a local web server that runs until he's closed, so don't wait for him to exit. The first start takes about 30 seconds because it builds `.venv` and installs one package.
+5. JARVIS opens his page in the default browser by himself. The address is `http://127.0.0.1:8765`, or the next port up (8766, 8767 and so on) if that one was taken. He prints it in his window, or in `jarvis.log` on Mac and Linux. Voice input needs Chrome or Edge.
 6. Test both keys for real. `/api/status` only shows that the keys are filled in, not that they work. Send `POST /api/chat` with `{"text": "Are you online?"}` and check the reply has no `"error"` field. Then send `POST /api/tts` with `{"text": "Online."}` and check it returns audio. If one fails, its message says which key is wrong.
 7. Tell the user to click the page once to wake JARVIS, then hold Space to talk. Next time they start him by double-clicking `run.bat` or running `./run.sh`.
 

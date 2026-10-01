@@ -498,6 +498,12 @@ class Handler(BaseHTTPRequestHandler):
         self._json(404, {"error": "not found"})
 
 
+class Server(ThreadingHTTPServer):
+    # Windows lets a second program share a port that's already taken when address reuse is on.
+    # With it off the bind fails instead, so main() moves on to the next free port.
+    allow_reuse_address = os.name != "nt"
+
+
 BANNER = r"""
        _   _    ____  __     __ ___  ____
       | | / \  |  _ \ \ \   / /|_ _|/ ___|
@@ -520,7 +526,7 @@ def main() -> None:
     server = None
     for candidate in range(port, port + 20):
         try:
-            server = ThreadingHTTPServer(("127.0.0.1", candidate), Handler)
+            server = Server(("127.0.0.1", candidate), Handler)
             break
         except OSError:
             continue
