@@ -17,26 +17,6 @@ if not defined PY (
   exit /b 1
 )
 
-rem ---- first run: private Python environment for JARVIS
-if not exist ".venv\Scripts\python.exe" (
-  echo.
-  echo   First run: setting JARVIS up. This takes about 30 seconds...
-  %PY% -m venv .venv
-  if errorlevel 1 (
-    echo   Couldn't create the Python environment. Try reinstalling Python.
-    pause
-    exit /b 1
-  )
-)
-
-".venv\Scripts\python.exe" -m pip install --quiet --disable-pip-version-check -r requirements.txt
-if errorlevel 1 (
-  echo.
-  echo   Installing failed. Check your internet connection and run this again.
-  pause
-  exit /b 1
-)
-
-".venv\Scripts\python.exe" jarvis.py
+%PY% jarvis.py
 echo.
 pause

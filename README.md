@@ -4,7 +4,7 @@
 
 **Talk to your own Iron Man assistant, out loud, in the real JARVIS voice.**
 
-Claude is the brain. [Fish Audio](https://ariacodez.ai/l/fish-audio) is the voice. You start it with one double-click.
+A free OpenRouter model is the brain. [Fish Audio](https://ariacodez.ai/l/fish-audio) is the voice. You start it with one double-click.
 
 ⏱ About 10 minutes &nbsp;·&nbsp; 🪟 Windows &nbsp;·&nbsp; 🍎 Mac &nbsp;·&nbsp; 🐧 Linux &nbsp;·&nbsp; 🧑‍💻 No coding
 
@@ -15,8 +15,8 @@ Claude is the brain. [Fish Audio](https://ariacodez.ai/l/fish-audio) is the voic
 ## ✨ What you get
 
 - 🎙️ **Hold Space and talk.** JARVIS answers out loud in the JARVIS voice from Fish Audio.
-- 🧠 **Real answers.** Claude does the thinking, so he can help with almost anything you ask.
-- 🆓 **A free brain option.** Skip the Claude key and use a free OpenRouter key instead.
+- 🧠 **Real answers.** An AI model does the thinking, so he can help with almost anything you ask.
+- 🆓 **A free brain.** The brain runs on a free OpenRouter key.
 - ⚡ **Protocols.** Say *"activate party protocol"* and he opens your music. Adding your own takes one line.
 - 😏 **E-girl mode.** Say *"activate e-girl mode"* if you want to ruin JARVIS. *"Activate jarvis mode"* brings him back.
 - 🔒 **Runs on your computer.** Your keys stay in one file on your machine.
@@ -26,9 +26,7 @@ Claude is the brain. [Fish Audio](https://ariacodez.ai/l/fish-audio) is the voic
 1. A computer running Windows, Mac or Linux
 2. **Python 3.10 or newer**, free at [python.org](https://www.python.org/downloads/)
 3. A **Fish Audio API key** for the voice → **[get one here](https://ariacodez.ai/l/fish-audio)**
-4. A **key for the brain**. Pick one:
-   - A **Claude API key** → [console.anthropic.com](https://console.anthropic.com/settings/keys)
-   - A **free OpenRouter key** → [openrouter.ai/keys](https://openrouter.ai/keys)
+4. A **free OpenRouter API key** for the brain → [openrouter.ai/keys](https://openrouter.ai/keys)
 5. **Chrome or Edge**, because they have voice input built in
 
 ---
@@ -43,7 +41,7 @@ Wake up, Claude. We're building JARVIS.
 Repo: https://github.com/AKCodez/make-your-own-jarvis
 Voice: Fish Audio model 41f0953d7a6b4c078445c7e65d620eeb (the JARVIS voice)
 Fish Audio key: PASTE_YOUR_FISH_AUDIO_KEY
-Brain key (Claude or OpenRouter): PASTE_YOUR_BRAIN_KEY
+OpenRouter key: PASTE_YOUR_OPENROUTER_KEY
 
 Set him up on my computer, bring him online, and tell me when he's ready.
 ```
@@ -64,8 +62,8 @@ You were given this repo, a Fish Audio voice model ID and two keys. Do this:
 3. Copy `.env.example` to `.env` and fill in the keys before you start anything:
    - `FISH_API_KEY` is the Fish Audio key.
    - `FISH_VOICE_ID` is the Fish Audio model ID from the prompt.
-   - The brain key goes in `ANTHROPIC_API_KEY` if it starts with `sk-ant-`, or in `OPENROUTER_API_KEY` if it starts with `sk-or-`. Leave the other one empty.
-4. Start JARVIS in his own window, so he keeps running after this chat is closed. On Windows, run `powershell -Command "Start-Process run.bat"` in the JARVIS folder. On Mac and Linux, run `nohup ./run.sh > jarvis.log 2>&1 &`. He is a local web server that runs until he's closed, so don't wait for him to exit. The first start takes about 30 seconds because it builds `.venv` and installs one package.
+   - `OPENROUTER_API_KEY` is the OpenRouter key.
+4. Start JARVIS in his own window, so he keeps running after this chat is closed. On Windows, run `powershell -Command "Start-Process run.bat"` in the JARVIS folder. On Mac and Linux, run `nohup ./run.sh > jarvis.log 2>&1 &`. He is a local web server that runs until he's closed, so don't wait for him to exit. There is nothing to install, he only needs Python.
 5. JARVIS opens his page in the default browser by himself. The address is `http://127.0.0.1:8765`, or the next port up (8766, 8767 and so on) if that one was taken. He prints it in his window, or in `jarvis.log` on Mac and Linux. Voice input needs Chrome or Edge.
 6. Test both keys for real. `/api/status` only shows that the keys are filled in, not that they work. Send `POST /api/chat` with `{"text": "Are you online?"}` and check the reply has no `"error"` field. Then send `POST /api/tts` with `{"text": "Online."}` and check it returns audio. If one fails, its message says which key is wrong.
 7. Tell the user to click the page once to wake JARVIS, then hold Space to talk. Next time they start him by double-clicking `run.bat` or running `./run.sh`.
@@ -85,14 +83,12 @@ Open Claude Code in the JARVIS folder and paste any of these:
 | Your own protocol | `Add a protocol: when I say "activate study mode", open YouTube lofi and Notion.` |
 | A different voice | `Switch JARVIS to the Fish Audio voice 612b878b113047d9a770c069c8b4fdfe.` |
 | Your own voice | `Help me clone my voice on Fish Audio and make it JARVIS's voice.` |
-| Faster replies | `Make JARVIS answer faster.` |
-| The free brain | `Switch JARVIS to the free OpenRouter brain. I'll paste the key into .env myself.` |
 | Iron Man colors | `Make the HUD glow red and gold instead of blue.` |
 | A fix | `JARVIS shows this error, fix it: <paste the error>` |
 
 ---
 
-## 🛠️ The manual way (no Claude needed)
+## 🛠️ The manual way (no Claude Code needed)
 
 ### 1. Install Python
 
@@ -110,18 +106,16 @@ Or with git: `git clone https://github.com/AKCodez/make-your-own-jarvis.git`
 ### 3. Get your two keys
 
 - 🐟 **Fish Audio (the voice):** [create your account](https://ariacodez.ai/l/fish-audio), click your profile, open **API Keys**, click **Create**, and copy the key.
-- 🧠 **The brain.** Pick one:
-  - **Claude:** go to [console.anthropic.com](https://console.anthropic.com/settings/keys), click **Create Key**, and copy it. It starts with `sk-ant-`.
-  - **The free option, OpenRouter:** go to [openrouter.ai/keys](https://openrouter.ai/keys), sign up, create a key, and copy it. It starts with `sk-or-`.
+- 🧠 **OpenRouter (the brain):** go to [openrouter.ai/keys](https://openrouter.ai/keys), sign up, create a key, and copy it. It starts with `sk-or-`.
 
-Fish Audio and Claude are pay-as-you-go. If JARVIS ever says he's out of credit, add a little on that site's billing page. The OpenRouter key runs a free model, with a limit of 50 questions a day.
+Fish Audio is pay-as-you-go. If JARVIS ever says his voice credit is empty, add a little on Fish Audio's billing page. The OpenRouter key runs a free model, with a limit of 50 questions a day.
 
 ### 4. Start JARVIS
 
 - **Windows:** double-click **`run.bat`**
 - **Mac or Linux:** open Terminal in the folder and run `chmod +x run.sh && ./run.sh`
 
-The first run sets everything up in about 30 seconds, then asks for your two keys. Paste each one (right-click or Ctrl+V) and press Enter. They're saved in a `.env` file on your computer, so you only do this once.
+The first run asks for your two keys. Paste each one (right-click or Ctrl+V) and press Enter. They're saved in a `.env` file on your computer, so you only do this once.
 
 ### 5. Talk to him
 
@@ -170,12 +164,10 @@ All settings live in the `.env` file. Close the JARVIS window and start it again
 | Setting | What it does | Default |
 |---|---|---|
 | `FISH_API_KEY` | Your Fish Audio key | |
-| `ANTHROPIC_API_KEY` | Your Claude key | |
-| `OPENROUTER_API_KEY` | A free OpenRouter key. JARVIS uses it when there's no Claude key | |
+| `OPENROUTER_API_KEY` | Your OpenRouter key | |
 | `FISH_VOICE_ID` | The voice he speaks with | JARVIS |
 | `FISH_MODEL` | The Fish Audio speech model | `s2.1-pro` |
-| `JARVIS_MODEL` | The Claude model. `claude-haiku-4-5` answers faster and costs less | `claude-opus-5-5` |
-| `OPENROUTER_MODEL` | The OpenRouter model, used with an OpenRouter key | `apodex/apodex-1.1-mini:free` |
+| `OPENROUTER_MODEL` | The model he thinks with. Any model ID from [openrouter.ai/models](https://openrouter.ai/models) works | `apodex/apodex-1.1-mini:free` |
 | `JARVIS_CALLS_YOU` | What he calls you | `sir` |
 | `PORT` | The local port. If it's busy, he picks the next free one | `8765` |
 
@@ -184,11 +176,11 @@ All settings live in the `.env` file. Close the JARVIS window and start it again
 - **"python is not recognized":** reinstall Python and tick **"Add python.exe to PATH"**.
 - **He doesn't hear me:** use Chrome or Edge and allow the microphone (click the icon at the left of the address bar). You can always type instead.
 - **He sounds like a robot:** that's the backup voice. The red pop-up tells you why. It's usually a wrong Fish Audio key or empty Fish Audio credit.
-- **"My brain key isn't working":** check the Claude or OpenRouter key in `.env`. With Claude, check that your account has credit too.
-- **"I've used up today's free questions":** the free OpenRouter brain allows 50 questions a day. It resets the next day, or you can switch to a Claude key.
+- **"My brain key isn't working":** check the OpenRouter key in `.env`.
+- **"I've used up today's free questions":** the free brain allows 50 questions a day. It resets the next day.
 - **"OpenRouter won't run the model":** the JARVIS window shows the reason. Free models come and go. If this one is gone, pick another free model on [openrouter.ai/models](https://openrouter.ai/models) and paste its ID after `OPENROUTER_MODEL=` in `.env`. If the reason mentions your data policy, change it in your [OpenRouter privacy settings](https://openrouter.ai/settings/privacy).
 - **Start over:** delete the `.env` file and start JARVIS again.
-- **Anything else:** paste the error into Claude and ask it to fix your JARVIS.
+- **Anything else:** paste the error into Claude Code and ask it to fix your JARVIS.
 
 ## 🔒 Your keys
 
@@ -198,7 +190,7 @@ JARVIS saves your keys in the `.env` file on your computer. That file is in `.gi
 
 <div align="center">
 
-Built by [@ariacodez](https://instagram.com/ariacodez) &nbsp;·&nbsp; Voice by [Fish Audio](https://ariacodez.ai/l/fish-audio) &nbsp;·&nbsp; Brain by [Claude](https://claude.com) or [OpenRouter](https://openrouter.ai)
+Built by [@ariacodez](https://instagram.com/ariacodez) &nbsp;·&nbsp; Voice by [Fish Audio](https://ariacodez.ai/l/fish-audio) &nbsp;·&nbsp; Brain by [OpenRouter](https://openrouter.ai)
 
 MIT License. Do whatever you want with it.
 

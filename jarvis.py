@@ -1,6 +1,6 @@
 """J.A.R.V.I.S. - your own Iron Man assistant.
 
-Claude is the brain (or a free OpenRouter model), Fish Audio is the voice, your browser is the HUD.
+A free OpenRouter model is the brain, Fish Audio is the voice, your browser is the HUD.
 Start it with run.bat (Windows) or ./run.sh (Mac/Linux).
 """
 from __future__ import annotations
@@ -17,12 +17,6 @@ import webbrowser
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
-try:
-    import anthropic
-except ImportError:  # run.bat / run.sh install it; this catches a bare "python jarvis.py"
-    print("\n  A package is missing. Start JARVIS with run.bat (Windows) or ./run.sh (Mac/Linux).\n")
-    sys.exit(1)
-
 ROOT = Path(__file__).resolve().parent
 ENV_FILE = ROOT / ".env"
 ENV_EXAMPLE = ROOT / ".env.example"
@@ -31,27 +25,16 @@ PROTOCOLS_FILE = ROOT / "protocols.json"
 
 FISH_TTS_URL = "https://api.fish.audio/v1/tts"
 FISH_SIGNUP_URL = "https://ariacodez.ai/l/fish-audio"
-CLAUDE_KEYS_URL = "https://console.anthropic.com/settings/keys"
 OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
 OPENROUTER_KEYS_URL = "https://openrouter.ai/keys"
 
 DEFAULTS = {
     "FISH_VOICE_ID": "41f0953d7a6b4c078445c7e65d620eeb",  # "JARVIS" in the Fish Audio voice library
     "FISH_MODEL": "s2.1-pro",
-    "JARVIS_MODEL": "claude-opus-5-5",
-    "OPENROUTER_MODEL": "apodex/apodex-1.1-mini:free",  # the free brain, used with an OpenRouter key
+    "OPENROUTER_MODEL": "apodex/apodex-1.1-mini:free",  # the brain, free on OpenRouter
     "JARVIS_CALLS_YOU": "sir",
     "PORT": "8765",
 }
-
-# Models that take output_config.effort ("low" keeps spoken replies quick).
-EFFORT_MODELS = {
-    "claude-opus-5-5", "claude-opus-5", "claude-sonnet-5-5", "claude-sonnet-5",
-    "claude-fable-5-1", "claude-fable-5", "claude-opus-4-8", "claude-opus-4-7",
-    "claude-opus-4-6", "claude-sonnet-4-6",
-}
-# Models that accept the server-side refusal fallback ("default" routing).
-FALLBACK_MODELS = {"claude-fable-5-1", "claude-opus-5-5", "claude-opus-5", "claude-sonnet-5-5"}
 
 NO_BROWSER = os.environ.get("JARVIS_NO_BROWSER") == "1"  # for testing: never open browser tabs
 
@@ -78,28 +61,11 @@ def load_settings() -> dict[str, str]:
     cfg = dict(DEFAULTS)
     cfg.update({k: v for k, v in read_env_file().items() if v})
     # Keys come from the .env file only, so a key another app left in the system environment
-    # never gets used (or billed) by surprise. The other settings can be overridden for testing.
+    # never gets used by surprise. The other settings can be overridden for testing.
     for key in DEFAULTS:
         if os.environ.get(key):
             cfg[key] = os.environ[key].strip()
     return cfg
-
-
-def which_brain(cfg: dict[str, str]) -> str:
-    """ "claude", "openrouter", or "" when there's no brain key yet. Claude wins if both keys are set."""
-    if cfg.get("ANTHROPIC_API_KEY"):
-        return "claude"
-    if cfg.get("OPENROUTER_API_KEY"):
-        return "openrouter"
-    return ""
-
-
-def brain_label(cfg: dict[str, str]) -> tuple[str, str]:
-    """(name, model) of the brain in use, for the banner and the HUD."""
-    brain = which_brain(cfg)
-    if brain == "openrouter":
-        return "OpenRouter", cfg["OPENROUTER_MODEL"]
-    return ("Claude", cfg["JARVIS_MODEL"]) if brain else ("", "")
 
 
 def save_to_env(updates: dict[str, str]) -> None:
@@ -131,46 +97,40 @@ def ask(prompt: str) -> str:
 
 def first_run(cfg: dict[str, str]) -> dict[str, str]:
     """Ask for any missing key in the console and save it to .env."""
-    need_voice = not cfg.get("FISH_API_KEY")
-    need_brain = not which_brain(cfg)
-    if not (need_voice or need_brain):
+    missing = [k for k in ("FISH_API_KEY", "OPENROUTER_API_KEY") if not cfg.get(k)]
+    if not missing:
         return cfg
     print("\n  Welcome. JARVIS needs two keys, then he's yours.")
     print("  Paste each one and press Enter (right-click or Ctrl+V pastes).")
     updates: dict[str, str] = {}
-    if need_voice:
+    if "FISH_API_KEY" in missing:
         print("\n  1) THE VOICE - your Fish Audio API key")
         print(f"     Get it here: {FISH_SIGNUP_URL}  (profile > API Keys > Create)")
         key = ask("     Fish Audio key: ")
         if key:
             updates["FISH_API_KEY"] = key
-    if need_brain:
-        print("\n  2) THE BRAIN - a Claude API key, or a free OpenRouter key. Either one works.")
-        print(f"     Claude:      {CLAUDE_KEYS_URL}  (Create Key, it starts with sk-ant-)")
-        print(f"     Free option: {OPENROUTER_KEYS_URL}  (sign up and create a key, it starts with sk-or-)")
-        key = ask("     Brain key: ")
-        if key.startswith("sk-or-"):
+    if "OPENROUTER_API_KEY" in missing:
+        print("\n  2) THE BRAIN - your free OpenRouter API key")
+        print(f"     Get it here: {OPENROUTER_KEYS_URL}  (sign up and create a key, it starts with sk-or-)")
+        key = ask("     OpenRouter key: ")
+        if key and not key.startswith("sk-or-"):
+            print("     That doesn't look like an OpenRouter key (they start with sk-or-). Saving it anyway.")
+        if key:
             updates["OPENROUTER_API_KEY"] = key
-        elif key:
-            if not key.startswith("sk-ant-"):
-                print("     That doesn't look like a Claude key (sk-ant-) or an OpenRouter key (sk-or-). Saving it as a Claude key.")
-            updates["ANTHROPIC_API_KEY"] = key
     if updates:
         save_to_env(updates)
         print("\n  Saved to the .env file in this folder. You won't be asked again.")
     cfg = load_settings()
-    still = [name for name, absent in (("the Fish Audio key", not cfg.get("FISH_API_KEY")), ("a brain key", not which_brain(cfg))) if absent]
+    still = [k for k in ("FISH_API_KEY", "OPENROUTER_API_KEY") if not cfg.get(k)]
     if still:
-        print(f"\n  Still missing: {' and '.join(still)}. JARVIS will start, and tells you what's missing.")
+        print(f"\n  Still missing: {', '.join(still)}. JARVIS will start, and tells you what's missing.")
     return cfg
 
 
-# ---------------------------------------------------------------- brain (Claude, or a free OpenRouter model)
+# ---------------------------------------------------------------- brain (a free OpenRouter model)
 
 _history: list[dict] = []
 _lock = threading.Lock()
-_client: anthropic.Anthropic | None = None
-_client_key = ""
 
 
 def system_prompt(cfg: dict[str, str]) -> str:
@@ -184,31 +144,6 @@ def system_prompt(cfg: dict[str, str]) -> str:
         "you can't do from here, say so briefly and stay in character. "
         f"The local date and time is {time.strftime('%A, %B %d, %Y, %I:%M %p')}."
     )
-
-
-def get_client(cfg: dict[str, str]) -> anthropic.Anthropic:
-    global _client, _client_key
-    key = cfg.get("ANTHROPIC_API_KEY", "")
-    if _client is None or key != _client_key:
-        _client = anthropic.Anthropic(api_key=key, timeout=60.0, max_retries=2)
-        _client_key = key
-    return _client
-
-
-def ask_claude(cfg: dict[str, str], messages: list[dict]) -> str:
-    model = cfg["JARVIS_MODEL"]
-    params: dict = {"model": model, "max_tokens": 16000, "system": system_prompt(cfg), "messages": messages}
-    if model in EFFORT_MODELS:
-        params["output_config"] = {"effort": "low"}
-    client = get_client(cfg)
-    if model in FALLBACK_MODELS:
-        # If the model declines a request, Anthropic re-runs it on a fallback model in the same call.
-        response = client.beta.messages.create(betas=["server-side-fallback-2026-07-01"], fallbacks="default", **params)
-    else:
-        response = client.messages.create(**params)
-    if response.stop_reason == "refusal":
-        return f"I'm afraid I can't help with that one, {cfg['JARVIS_CALLS_YOU']}."
-    return " ".join(b.text for b in response.content if b.type == "text" and b.text)
 
 
 class OpenRouterError(Exception):
@@ -241,7 +176,9 @@ def openrouter_post(cfg: dict[str, str], payload: dict) -> dict:
     return data
 
 
-def ask_openrouter(cfg: dict[str, str], messages: list[dict]) -> str:
+def think(cfg: dict[str, str], text: str) -> str:
+    with _lock:
+        messages = list(_history) + [{"role": "user", "content": text}]
     payload = {
         "model": cfg["OPENROUTER_MODEL"],
         "messages": [{"role": "system", "content": system_prompt(cfg)}, *messages],
@@ -257,41 +194,15 @@ def ask_openrouter(cfg: dict[str, str], messages: list[dict]) -> str:
         data = openrouter_post(cfg, payload)
     choices = data.get("choices") or [{}]
     content = (choices[0].get("message") or {}).get("content")
-    return content if isinstance(content, str) else ""
-
-
-def think(cfg: dict[str, str], text: str) -> str:
-    with _lock:
-        messages = list(_history) + [{"role": "user", "content": text}]
-    reply = ask_openrouter(cfg, messages) if which_brain(cfg) == "openrouter" else ask_claude(cfg, messages)
-    reply = " ".join(reply.split()) or f"I'm not sure what to say to that, {cfg['JARVIS_CALLS_YOU']}."
+    reply = " ".join(content.split()) if isinstance(content, str) else ""
+    reply = reply or f"I'm not sure what to say to that, {cfg['JARVIS_CALLS_YOU']}."
     with _lock:
         _history.extend([{"role": "user", "content": text}, {"role": "assistant", "content": reply}])
         del _history[:-16]  # keep the last 8 exchanges
     return reply
 
 
-def brain_error(err: Exception, cfg: dict[str, str]) -> str:
-    title = cfg["JARVIS_CALLS_YOU"]
-    if isinstance(err, anthropic.AuthenticationError):
-        return f"My brain key isn't working, {title}. Check ANTHROPIC_API_KEY in the .env file."
-    if isinstance(err, anthropic.PermissionDeniedError):
-        return f"My Claude key isn't allowed to use that model, {title}."
-    if isinstance(err, anthropic.NotFoundError):
-        return f"I can't find the model {cfg['JARVIS_MODEL']}, {title}. Check JARVIS_MODEL in the .env file."
-    if isinstance(err, anthropic.RateLimitError):
-        return f"I'm being rate limited, {title}. Give me a moment and try again."
-    if isinstance(err, anthropic.BadRequestError):
-        detail = str(getattr(err, "message", err)).lower()
-        if "credit" in detail or "billing" in detail:
-            return f"Your Claude account is out of credit, {title}. Add some at console.anthropic.com."
-        return f"Claude rejected that request, {title}. The details are in the JARVIS window."
-    if isinstance(err, anthropic.APIConnectionError):
-        return f"I can't reach my brain, {title}. Check your internet connection."
-    return f"Claude is having a moment, {title}. Try again shortly."
-
-
-def openrouter_error(err: OpenRouterError, cfg: dict[str, str]) -> str:
+def brain_error(err: OpenRouterError, cfg: dict[str, str]) -> str:
     title = cfg["JARVIS_CALLS_YOU"]
     if err.status == 401:
         return f"My brain key isn't working, {title}. Check OPENROUTER_API_KEY in the .env file."
@@ -419,12 +330,10 @@ class Handler(BaseHTTPRequestHandler):
             self._send(200, INDEX_HTML.read_bytes(), "text/html; charset=utf-8")
         elif path == "/api/status":
             cfg = load_settings()
-            brain_name, model = brain_label(cfg)
             self._json(200, {
                 "voice": bool(cfg.get("FISH_API_KEY")),
-                "brain": bool(brain_name),
-                "brain_name": brain_name,
-                "model": model,
+                "brain": bool(cfg.get("OPENROUTER_API_KEY")),
+                "model": cfg["OPENROUTER_MODEL"],
                 "calls": cfg["JARVIS_CALLS_YOU"],
                 "protocols": [p["say"] for p in load_protocols()],
             })
@@ -457,18 +366,14 @@ class Handler(BaseHTTPRequestHandler):
                 log(f"JARVIS: {reply}  (protocol)")
                 self._json(200, {"reply": reply, "protocol": protocol["say"]})
                 return
-            if not which_brain(cfg):
-                self._json(200, {"reply": f"My brain isn't connected yet, {title}. Add a Claude or OpenRouter key to the .env file and restart me.", "error": "brain"})
+            if not cfg.get("OPENROUTER_API_KEY"):
+                self._json(200, {"reply": f"My brain isn't connected yet, {title}. Add OPENROUTER_API_KEY to the .env file and restart me.", "error": "brain"})
                 return
             try:
                 reply = think(cfg, text)
-            except anthropic.APIError as err:
-                log(f"Claude error: {err}")
-                self._json(200, {"reply": brain_error(err, cfg), "error": "claude"})
-                return
             except OpenRouterError as err:
                 log(f"OpenRouter error {err}")
-                self._json(200, {"reply": openrouter_error(err, cfg), "error": "openrouter"})
+                self._json(200, {"reply": brain_error(err, cfg), "error": "brain"})
                 return
             except Exception as err:  # noqa: BLE001 - keep JARVIS alive and report it
                 log(f"Unexpected error: {err!r}")
@@ -535,12 +440,11 @@ def main() -> None:
         sys.exit(1)
 
     url = f"http://127.0.0.1:{server.server_address[1]}"
-    brain_name, model = brain_label(cfg)
     print("\n  ==================================================")
     print("    J.A.R.V.I.S. is online")
     print(f"    Open {url}  (Chrome or Edge, for voice input)")
     print(f"    Voice: Fish Audio {cfg['FISH_VOICE_ID']} ({cfg['FISH_MODEL']})")
-    print(f"    Brain: {brain_name} {model}" if brain_name else "    Brain: not connected yet")
+    print(f"    Brain: OpenRouter {cfg['OPENROUTER_MODEL']}" if cfg.get("OPENROUTER_API_KEY") else "    Brain: not connected yet")
     print("    Close this window to shut JARVIS down.")
     print("  ==================================================\n")
     if not NO_BROWSER:
