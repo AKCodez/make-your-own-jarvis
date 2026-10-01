@@ -38,25 +38,32 @@ Claude is the brain. [Fish Audio](https://ariacodez.ai/l/fish-audio) is the voic
 If you have [Claude Code](https://claude.com/claude-code), open it, paste this, and swap in your two keys:
 
 ```text
-Set up JARVIS for me and start it: https://github.com/AKCodez/make-your-own-jarvis
+Wake up, Claude. We're building JARVIS.
 
+Repo: https://github.com/AKCodez/make-your-own-jarvis
+Voice: Fish Audio model 41f0953d7a6b4c078445c7e65d620eeb (the JARVIS voice)
 Fish Audio key: PASTE_YOUR_FISH_AUDIO_KEY
-Claude or OpenRouter key: PASTE_YOUR_BRAIN_KEY
+Brain key (Claude or OpenRouter): PASTE_YOUR_BRAIN_KEY
+
+Set him up on my computer, bring him online, and tell me when he's ready.
 ```
 
 Hit Enter and Claude does the whole setup. Boom, you've got JARVIS. 🎉
+
+The voice line is the JARVIS voice on [Fish Audio](https://ariacodez.ai/l/fish-audio). Swap that model ID for any other Fish Audio voice and he'll sound like that instead.
 
 If you'd rather not paste keys into a chat, use the manual way below.
 
 <details>
 <summary>🤖 Setup steps for Claude (or any AI assistant)</summary>
 
-You were given this repo and two keys. Do this:
+You were given this repo, a Fish Audio voice model ID and two keys. Do this:
 
 1. Make sure Python 3.10 or newer is installed (`python --version`, or `python3 --version` on Mac and Linux). Install it if it's missing.
 2. Clone this repo into the user's home folder, unless they named another place.
 3. Copy `.env.example` to `.env` and fill in the keys before you start anything:
    - `FISH_API_KEY` is the Fish Audio key.
+   - `FISH_VOICE_ID` is the Fish Audio model ID from the prompt.
    - The brain key goes in `ANTHROPIC_API_KEY` if it starts with `sk-ant-`, or in `OPENROUTER_API_KEY` if it starts with `sk-or-`. Leave the other one empty.
 4. Start JARVIS in his own window, so he keeps running after this chat is closed. On Windows, run `powershell -Command "Start-Process run.bat"` in the JARVIS folder. On Mac and Linux, run `nohup ./run.sh > jarvis.log 2>&1 &`. He is a local web server that runs until he's closed, so don't wait for him to exit. The first start takes about 30 seconds because it builds `.venv` and installs one package.
 5. JARVIS opens his page in the default browser by himself. The address is `http://127.0.0.1:8765`, or the next port up (8766, 8767 and so on) if that one was taken. He prints it in his window, or in `jarvis.log` on Mac and Linux. Voice input needs Chrome or Edge.
