@@ -191,7 +191,7 @@
   <header>
     <div>
       <span class="pill"><span class="dot" id="dotVoice"></span>VOICE &middot; FISH AUDIO</span>
-      <span class="pill"><span class="dot" id="dotBrain"></span>BRAIN &middot; CLAUDE</span>
+      <span class="pill"><span class="dot" id="dotBrain"></span>BRAIN &middot; <span id="brainName">CLAUDE</span></span>
     </div>
     <div id="clock"></div>
   </header>
@@ -216,7 +216,7 @@
       <input id="typeBox" placeholder="Or type to JARVIS..." autocomplete="off">
       <button type="submit">SEND</button>
     </form>
-    <div class="credit">Voice by Fish Audio &middot; Brain by Claude</div>
+    <div class="credit">Voice by Fish Audio &middot; Brain by <span id="brainCredit">Claude</span></div>
   </footer>
 
   <div class="toast" id="toast"></div>
@@ -277,7 +277,11 @@
       calls = s.calls || 'sir';
       $('dotVoice').className = 'dot ' + (s.voice ? 'on' : 'off');
       $('dotBrain').className = 'dot ' + (s.brain ? 'on' : 'off');
-      if (!s.brain) toast('No Claude key yet. Add ANTHROPIC_API_KEY to the .env file and restart JARVIS.');
+      if (s.brain_name) {
+        $('brainName').textContent = s.brain_name.toUpperCase();
+        $('brainCredit').textContent = s.brain_name;
+      }
+      if (!s.brain) toast('No brain key yet. Add a Claude or OpenRouter key to the .env file and restart JARVIS.');
     } catch {
       toast('Lost contact with JARVIS. Is the JARVIS window still open?');
     }
