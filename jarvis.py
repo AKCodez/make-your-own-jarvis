@@ -30,7 +30,7 @@ OPENROUTER_KEYS_URL = "https://openrouter.ai/keys"
 
 DEFAULTS = {
     "FISH_VOICE_ID": "41f0953d7a6b4c078445c7e65d620eeb",  # "JARVIS" in the Fish Audio voice library
-    "FISH_MODEL": "s2.1-pro",
+    "FISH_MODEL": "s2.1-pro-free",  # S2.1 Pro at $0, free on the Fish Audio API until Nov 30, 2026
     "OPENROUTER_MODEL": "apodex/apodex-1.1-mini:free",  # the brain, free on OpenRouter
     "JARVIS_CALLS_YOU": "sir",
     "PORT": "8765",

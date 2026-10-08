@@ -16,7 +16,7 @@ A free OpenRouter model is the brain. [Fish Audio](https://ariacodez.ai/l/fish-a
 
 - 🎙️ **Hold Space and talk.** JARVIS answers out loud in the JARVIS voice from Fish Audio.
 - 🧠 **Real answers.** An AI model does the thinking, so he can help with almost anything you ask.
-- 🆓 **A free brain.** The brain runs on a free OpenRouter key.
+- 🆓 **Free to run.** The voice is Fish Audio's S2.1 Pro, free on the API until the end of November 2026. The brain runs on a free OpenRouter key.
 - ⚡ **Protocols.** Say *"activate party protocol"* and he opens your music. Adding your own takes one line.
 - 😏 **E-girl mode.** Say *"activate e-girl mode"* if you want to ruin JARVIS. *"Activate jarvis mode"* brings him back.
 - 🔒 **Runs on your computer.** Your keys stay in one file on your machine.
@@ -25,7 +25,7 @@ A free OpenRouter model is the brain. [Fish Audio](https://ariacodez.ai/l/fish-a
 
 1. A computer running Windows, Mac or Linux
 2. **Python 3.10 or newer**, free at [python.org](https://www.python.org/downloads/)
-3. A **Fish Audio API key** for the voice → **[get one here](https://ariacodez.ai/l/fish-audio)**
+3. A **free Fish Audio API key** for the voice → **[get one here](https://ariacodez.ai/l/fish-audio)**
 4. A **free OpenRouter API key** for the brain → [openrouter.ai/keys](https://openrouter.ai/keys)
 5. **Chrome or Edge**, because they have voice input built in
 
@@ -108,7 +108,7 @@ Or with git: `git clone https://github.com/AKCodez/make-your-own-jarvis.git`
 - 🐟 **Fish Audio (the voice):** [create your account](https://ariacodez.ai/l/fish-audio), click your profile, open **API Keys**, click **Create**, and copy the key.
 - 🧠 **OpenRouter (the brain):** go to [openrouter.ai/keys](https://openrouter.ai/keys), sign up, create a key, and copy it. It starts with `sk-or-`.
 
-Fish Audio is pay-as-you-go. If JARVIS ever says his voice credit is empty, add a little on Fish Audio's billing page. The OpenRouter key runs a free model, with a limit of 50 questions a day.
+The voice runs on Fish Audio's S2.1 Pro, which is free on the API until November 30, 2026. After that it's pay-as-you-go: set `FISH_MODEL=s2.1-pro` in `.env` and add a little credit on Fish Audio's billing page. The OpenRouter key runs a free model, with a limit of 50 questions a day.
 
 ### 4. Start JARVIS
 
@@ -166,7 +166,7 @@ All settings live in the `.env` file. Close the JARVIS window and start it again
 | `FISH_API_KEY` | Your Fish Audio key | |
 | `OPENROUTER_API_KEY` | Your OpenRouter key | |
 | `FISH_VOICE_ID` | The voice he speaks with | JARVIS |
-| `FISH_MODEL` | The Fish Audio speech model | `s2.1-pro` |
+| `FISH_MODEL` | The Fish Audio speech model. `s2.1-pro-free` is S2.1 Pro at $0 until November 30, 2026. `s2.1-pro` is the paid one | `s2.1-pro-free` |
 | `OPENROUTER_MODEL` | The model he thinks with. Any model ID from [openrouter.ai/models](https://openrouter.ai/models) works | `apodex/apodex-1.1-mini:free` |
 | `JARVIS_CALLS_YOU` | What he calls you | `sir` |
 | `PORT` | The local port. If it's busy, he picks the next free one | `8765` |
@@ -175,7 +175,7 @@ All settings live in the `.env` file. Close the JARVIS window and start it again
 
 - **"python is not recognized":** reinstall Python and tick **"Add python.exe to PATH"**.
 - **He doesn't hear me:** use Chrome or Edge and allow the microphone (click the icon at the left of the address bar). You can always type instead.
-- **He sounds like a robot:** that's the backup voice. The red pop-up tells you why. It's usually a wrong Fish Audio key or empty Fish Audio credit.
+- **He sounds like a robot:** that's the backup voice. The red pop-up tells you why. It's usually a wrong Fish Audio key. After November 30, 2026 the free voice model ends, so set `FISH_MODEL=s2.1-pro` in `.env` and add a little Fish Audio credit.
 - **"My brain key isn't working":** check the OpenRouter key in `.env`.
 - **"I've used up today's free questions":** the free brain allows 50 questions a day. It resets the next day.
 - **"OpenRouter won't run the model":** the JARVIS window shows the reason. Free models come and go. If this one is gone, pick another free model on [openrouter.ai/models](https://openrouter.ai/models) and paste its ID after `OPENROUTER_MODEL=` in `.env`. If the reason mentions your data policy, change it in your [OpenRouter privacy settings](https://openrouter.ai/settings/privacy).
